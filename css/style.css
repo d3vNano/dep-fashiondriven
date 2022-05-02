@@ -136,12 +136,14 @@ footer {
 
 .footer-table ul {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .footer-table li {
     width: 200px;
     height: 235px;
     margin-right: 20px;
+    margin-bottom: 25px;
     padding: 10px;
 
     display: flex;

@@ -1,13 +1,16 @@
 let userName;
 
+let linkImg;
+
 let chosenModel;
 let chosenCollar;
 let chosenTissue;
 
+let API = "https://mock-api.driven.com.br/api/v4/shirts-api/shirts";
+let renderApi;
+let dataGet;
 
 let regex;
-
-let linkImg = document.querySelector(".fourth input").value
 
 askName();
 function askName (){
@@ -26,8 +29,9 @@ function selectModel (select) {
     }
   
     select.classList.add("selected");
-    chosenModel = document.getElementById(select)
+    chosenModel = select.id;
     console.log(chosenModel);
+
     activateOrder();
 
 }
@@ -40,6 +44,9 @@ function selectCollar (select) {
     }
   
     select.classList.add("selected");
+    chosenCollar = select.id;
+    console.log(chosenCollar);
+
     activateOrder();
 }
 
@@ -51,14 +58,17 @@ function selectTissue (select) {
     }
   
     select.classList.add("selected");
+    chosenTissue = select.id;
+    console.log(chosenTissue);
+
     activateOrder();
 }
 
-function assignValue () {
-  const link = document.querySelector(".fourth input").value;
+function assignValue (valor) {
+  linkImg = document.querySelector(".fourth input").value;
 
-  if (link !== "") {
-    return true;
+  if (linkImg !== undefined) {
+    activateOrder();
   }
 }
 
@@ -68,7 +78,7 @@ function activateOrder () {
   const tissue = document.querySelector(".third .selected");
   const requestButton = document.querySelector(".fourth button");
 
-  if (model !== null && collar !== null && tissue !== null && assignValue() !== undefined) {
+  if (model !== null && collar !== null && tissue !== null && linkImg !== undefined) {
     
     requestButton.classList.add("active");
     requestButton.innerHTML = "Confirmar pedido";
@@ -77,33 +87,48 @@ function activateOrder () {
 }
 
 function completeOrder () {
+  assignValue();
   const promise = axios.post(API, 
     {
-      "model": "t-shirt" | "long" | "top-tank",
-      "neck": "v-neck" | "round" | "polo",
-      "material": "silk" | "cotton" | "polyester",
+      "model": chosenModel,
+      "neck": chosenCollar,
+      "material": chosenTissue,
       "image": linkImg,
       "owner": "Criador: " + userName,
       "author": userName
     }
   );
 
-  promise.then('alert("Confirmamos sua encomenda! Obrigado.")')
+  promise.then(alert("Confirmamos sua encomenda! Obrigado."))
+  promise.catch(alert("Ops! Insira um Link de Imagem válido!"))
+  renderAPI ();
+}
 
+function renderAPI (){
+  renderAPI = axios.get(API);
+  renderAPI.then(saveData);
+}
+renderAPI ();
+
+function saveData (data){
+  dataGet = data.data;
+  console.log(dataGet);
+  lastOrders();  
 }
 
 function lastOrders () {
+  const elemento = document.querySelector("footer ul");
+  elemento.innerHTML = "";
+  let size = Number(dataGet.length);
 
-  `
-  <li>
-    <img src="images/Blusa1.png"/>
-    <p><strong>Criador: Nome</strong></p>
-  </li>
-  `
-}
-
-function renderOrders(){
-  const promisse = axios.get("https://mock-api.driven.com.br/api/v4/shirts-api/shirts");
-
-  
+  for(let i=0; i<size; i++) {
+    let name = dataGet[i].owner;
+    let img = dataGet[i].image;
+    elemento.innerHTML += `
+    <li>
+      <img src="${img}"/>
+      <p><strong>Criador: ${name}</strong></p>
+    </li>
+    `
+  }
 }
